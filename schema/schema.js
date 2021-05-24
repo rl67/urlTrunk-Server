@@ -47,7 +47,7 @@ const TagType = new GraphQLObjectType({
         bookmarks: {
             type: new GraphQLList(BookMarkType),
             resolve(parent, args) {
-                // return _.filter(bookMarks, { tagId: parent.id })
+                return Tag.filter(bookMarks, { tagId: parent.id })
             }
         }
     })
@@ -60,23 +60,19 @@ const BookMarkType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
-        url: { type: GraphQLString }
-        // tags: { type:[GraphQLID] }
-        // tags: { type: new GraphQLList(GraphQLString) }
-        // tags: {      RELEVANT?
-        //     type: new GraphQLList(TagType),
-        //     resolve(parent, args) {
-        //         // return  _.filter(tags, {id: parent.tagId } );
-        //     }
-        // }
+        url: { type: GraphQLString },
+        note: { type: GraphQLString },
+        tags: { 
+            type: new GraphQLList(GraphQLID),
+            resolve(parent, args){
+                const { ids } = args;
+                return Tag.filter( (a) => ids.includes(a.id) );
+            }
+         }
     })
 });
 
-const sbookmarks = [
-    '609cd0c9e8231a51190657ea',
-    '6081b760fa6a712aadae777c'
-]
- 
+// Query items in the database
 const RootQuery = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
@@ -93,7 +89,6 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(TagListType),
             resolve(parent, args) {
                 return TagList.find({});
-                // ??return TagList.find().where('_id').in(sbookmarks).exec();
 
             }
         },
@@ -112,7 +107,7 @@ const RootQuery = new GraphQLObjectType({
                 return Tag.find({});
             }
         },
-        // Return a bookmark by index
+        // Return a bookmark by id
         bookMark: {
             type: BookMarkType,
             args: { id: { type: GraphQLID } },
@@ -126,10 +121,22 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args) {
                 return Url.find({});
             }
+        },
+        // Find bookmarks by tag(s)
+        bookmarksByTags: {
+            type: new GraphQLList(BookMarkType),
+            args: { tags: { type: GraphQLList(GraphQLID) } },
+            resolve(parent, args){               
+                console.log(args) //?dbg
+                // let crit = ["609d7e331b152b6fc5cd0ae4", "609d7e4c1b152b6fc5cd0ae5"];
+                console.log(args.tags) //?dbg
+                return Url.find({ tags: { $all: args.tags } });
+            }
         }
     }
 });
 
+// To add, update and delete items in the database
 const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
@@ -166,14 +173,16 @@ const Mutation = new GraphQLObjectType({
             args: {
                 name: { type: GraphQLString },
                 url: { type: GraphQLString },
-                // tags: { type: [GraphQLID] }
+                note: { type: GraphQLString },
+                tags: { type: new GraphQLList(GraphQLID) }
             },
             resolve(parent, args){
                 // Create DB model object to store received object in the DB
                 let bookmark = new Url({
                     name: args.name,
                     url: args.url,
-                    // tags: args.tags
+                    note: args.note,
+                    tags: args.tags     // Array 
                 });
                 return bookmark.save();
             }
@@ -185,3 +194,12 @@ module.exports = new GraphQLSchema({
     query: RootQuery,
     mutation: Mutation
 });
+
+/*
+mutation AddBookmark($name: String, $url: String, $note: String, $tags: [ID]) {
+  addBookmark(name: $name, url: $url, note: $note, tags: $tags) {
+    id
+    name
+  }
+}
+*/

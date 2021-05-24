@@ -1,3 +1,5 @@
+const Tag = require('./tag.model');
+
 const mongoose = require('mongoose');
 
 const urlSchema = new mongoose.Schema({
@@ -9,13 +11,16 @@ const urlSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    // tags: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Tag"
-    // }]
+    note: {
+        type: String
+    },
     tags: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag"
     }]
+    // tags: [{
+    //     type: String,
+    // }]
 }, {timestamp: true});
 
 const Url = mongoose.model('Url', urlSchema);
