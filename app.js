@@ -17,7 +17,11 @@ var tagListRouter = require('./routes/tagList.routes');
 var app = express();
 
 // Connect to the data base.
-mongoose.connect(process.env.dbURI, {useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect(process.env.dbURI, 
+  { useNewUrlParser: true, 
+    useUnifiedTopology: true, 
+    useFindAndModify: false
+  })
   .then((result) => {
     console.log('Connected to the database.');
   })

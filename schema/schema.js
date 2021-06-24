@@ -64,9 +64,8 @@ const BookMarkType = new GraphQLObjectType({
         note: { type: GraphQLString },
         tags: { 
             type: new GraphQLList(GraphQLID),
-            resolve(parent, args){
-                const { ids } = args;
-                return Tag.filter( (a) => ids.includes(a.id) );
+            resolve(parent, args) {
+                return parent.tags;     // ??hm Returnerar eit array av tag id'ar. "funkar", men kveit ikkje kvifor
             }
          }
     })
@@ -186,6 +185,25 @@ const Mutation = new GraphQLObjectType({
                 });
                 return bookmark.save();
             }
+        },
+        updateBookmark : {
+           type: BookMarkType,
+           args: {
+               id: { type: GraphQLID },
+               name: { type: GraphQLString },
+               url: { type: GraphQLString },
+               note: { type: GraphQLString },
+               tags: { type: new GraphQLList(GraphQLID) }
+           },
+           resolve(parent, args)  {
+               console.log(args.tags); //??
+               return Url.findOneAndUpdate( 
+                   {_id: args.id }, 
+                   { name: args.name,
+                     url: args.url,
+                     tags: args.tags  },
+                   { new: true } );     // returns the modified document
+           }
         }
     }
 })
