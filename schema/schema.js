@@ -201,6 +201,7 @@ const Mutation = new GraphQLObjectType({
                    {_id: args.id }, 
                    { name: args.name,
                      url: args.url,
+                     note: args.note,
                      tags: args.tags  },
                    { new: true } );     // returns the modified document
            }
