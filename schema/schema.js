@@ -171,7 +171,7 @@ const Mutation = new GraphQLObjectType({
             type: BookMarkType,
             args: {
                 name: { type: GraphQLString },
-                url: { type: GraphQLString },
+                url:  { type: GraphQLString },
                 note: { type: GraphQLString },
                 tags: { type: new GraphQLList(GraphQLID) }
             },
@@ -205,6 +205,17 @@ const Mutation = new GraphQLObjectType({
                      tags: args.tags  },
                    { new: true } );     // returns the modified document
            }
+        },
+        deleteBookmark: {
+            type: BookMarkType,
+            args: { 
+                id: { type: GraphQLID }, 
+                name: { type: GraphQLString }
+            },
+            resolve(parent, args) {
+                console.log(args); //??
+                return Url.findOneAndDelete({ _id: args.id });
+            }
         }
     }
 })
