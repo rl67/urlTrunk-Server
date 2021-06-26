@@ -47,7 +47,7 @@ const TagType = new GraphQLObjectType({
         bookmarks: {
             type: new GraphQLList(BookMarkType),
             resolve(parent, args) {
-                return Tag.filter(bookMarks, { tagId: parent.id })
+                return Url.find({tags: { $all: parent.id } })
             }
         }
     })
@@ -126,9 +126,6 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(BookMarkType),
             args: { tags: { type: GraphQLList(GraphQLID) } },
             resolve(parent, args){               
-                console.log(args) //?dbg
-                // let crit = ["609d7e331b152b6fc5cd0ae4", "609d7e4c1b152b6fc5cd0ae5"];
-                console.log(args.tags) //?dbg
                 return Url.find({ tags: { $all: args.tags } });
             }
         }
@@ -213,7 +210,6 @@ const Mutation = new GraphQLObjectType({
                 name: { type: GraphQLString }
             },
             resolve(parent, args) {
-                console.log(args); //??
                 return Url.findOneAndDelete({ _id: args.id });
             }
         }
