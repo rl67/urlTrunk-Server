@@ -62,6 +62,12 @@ const BookMarkType = new GraphQLObjectType({
         name: { type: GraphQLString },
         url: { type: GraphQLString },
         note: { type: GraphQLString },
+        tagsII: { 
+            type: GraphQLList(TagType),
+            resolve(parent, args) {
+                return Tag.find({ _id: { $in: parent.tags } })
+            }
+        },
         tags: { 
             type: new GraphQLList(GraphQLID),
             resolve(parent, args) {
