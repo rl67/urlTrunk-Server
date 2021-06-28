@@ -73,6 +73,12 @@ const BookMarkType = new GraphQLObjectType({
             resolve(parent, args) {
                 return parent.tags;     // ??hm Returnerar eit array av tag id'ar. "funkar", men kveit ikkje kvifor
             }
+         },
+         tagLists: {
+             type: new GraphQLList(TagListType),
+             resolve(parent, args){
+                return TagList.find({ _id: { $in: parent.tags } });
+             }
          }
     })
 });
